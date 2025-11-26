@@ -110,6 +110,26 @@ def _render_with_playwright(url: str) -> Dict:
             page = browser.new_page()
             # Use networkidle so single-page apps have time to render
             page.goto(url, wait_until="networkidle", timeout=30000)
+            
+            # Wait for JavaScript rendering to complete
+            # Multiple waits to ensure content is fully rendered
+            try:
+                page.wait_for_load_state("domcontentloaded", timeout=5000)
+            except Exception:
+                pass
+            
+            # Give JS frameworks time to render (Vue, React, Angular, etc.)
+            try:
+                page.wait_for_timeout(2000)  # Wait 2 seconds for framework rendering
+            except Exception:
+                pass
+            
+            # Wait for body to have actual content
+            try:
+                page.wait_for_selector("body", state="attached", timeout=5000)
+            except Exception:
+                pass
+            
             # Grab rendered HTML and visible text (body innerText)
             html = page.content() or ""
             # Try innerText('body') for visible text; fallback to content-based strip

@@ -172,7 +172,7 @@ def _heuristic_extract_answer(page_text: str) -> Optional[Any]:
     1. JSON-like `"answer": <value>` or 'answer' = <value> (handles quoted strings, numbers, true/false)
     2. Quoted string patterns: "the answer is '...'" or Answer: "..."
     3. Lines starting with 'Answer:' or 'The answer is' grabbing the rest of the line (words allowed)
-    4. Bare words enclosed in quotes (single or double) - but filter out short page titles
+    4. Bare words enclosed in quotes (single or double)
     5. First standalone number (float or int)
     6. First non-empty line (as last resort)
     Returns int/float where possible, otherwise returns a stripped string.
@@ -217,14 +217,10 @@ def _heuristic_extract_answer(page_text: str) -> Optional[Any]:
     if m_line2:
         return m_line2.group(1).strip().strip(' .;,"\'\n\r\t')
 
-    # 4) Any quoted token anywhere (first occurrence) - but skip very short page-title-like answers
+    # 4) Any quoted token anywhere (first occurrence)
     m_anyquote = re.search(r'["\']([^"\']{1,500})["\']', txt)
     if m_anyquote:
-        candidate = m_anyquote.group(1).strip()
-        # Filter: if it looks like a page title (short, all caps or title case, contains "demo" or "page")
-        # it's probably not the answer to a quiz question
-        if not (len(candidate) < 30 and ("demo" in candidate.lower() or "page" in candidate.lower())):
-            return candidate
+        return m_anyquote.group(1).strip()
 
     # 5) Any standalone number (float or int)
     m_num = re.search(r'([-+]?\d*\.\d+|\d+)', txt)
@@ -442,8 +438,19 @@ async def solve_quiz_chain(
                                 submit_url = urljoin(current_url, href)
                             break
 
+                # If still no submit URL but we have an answer, try common paths
                 if not submit_url:
-                    raise RuntimeError("Could not find submit URL on the page.")
+                    # Common submit endpoint patterns
+                    for common_path in ["/submit", "/api/submit", "/quiz/submit", "/answer", "/api/answer"]:
+                        try_url = urljoin(current_url, common_path)
+                        step_info["submit_url"] = try_url
+                        # Don't error yet - let's try submitting
+                        submit_url = try_url
+                        step_info["note"] = step_info.get("note", "") + f" Using common endpoint: {common_path}"
+                        break
+                
+                if not submit_url:
+                    raise RuntimeError("Could not find or infer submit URL on the page.")
                 step_info["submit_url"] = submit_url
 
                 # 5. Build payload and submit

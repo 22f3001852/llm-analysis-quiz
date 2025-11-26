@@ -41,7 +41,6 @@ CRITICAL RULES:
 - DO NOT explain your reasoning, just return the JSON with the answer
 - DO NOT say you cannot access content - everything is provided below
 - IMPORTANT: You MUST provide a non-empty answer. If you're uncertain, make your best educated guess based on the context provided.
-- CRITICAL: DO NOT return page titles, headings, or menu items as answers. The answer is usually a computed result, not the page title.
 
 COMMON QUESTION PATTERNS TO LOOK FOR:
 - "What is the sum of..." → Add up the numbers
