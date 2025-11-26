@@ -1,0 +1,51 @@
+﻿
+[1m[93m============================================================[0m
+[1m[93m  LLM Analysis Quiz Solver - API Test Suite[0m
+[1m[93m============================================================[0m
+  Base URL: http://127.0.0.1:8000
+  Secret: eVUyyKnAP956QwwgmWcB...
+  Mode: Demo Endpoint Test
+[1m[93m============================================================[0m
+
+[1m[96m[TEST][0m Server Health Check
+[92mΓ£ô PASS[0m: Server responding on http://127.0.0.1:8000
+
+[1m[96m[TEST][0m Valid Payload (expect 200 OK)
+[92mΓ£ô PASS[0m: Got 200 OK with status='ok'
+[93mΓä╣ INFO[0m:   Steps: 1
+[93mΓä╣ INFO[0m:   Time: 2.234000000054948s
+[93mΓä╣ INFO[0m:   Within limit: True
+
+[1m[96m[TEST][0m Invalid Secret (expect 403 Forbidden)
+[92mΓ£ô PASS[0m: Got expected 403 Forbidden
+
+[1m[96m[TEST][0m Invalid JSON (expect 400 Bad Request)
+[92mΓ£ô PASS[0m: Got expected 400 Bad Request
+
+[1m[96m[TEST][0m Missing Fields (expect 400 Bad Request)
+[92mΓ£ô PASS[0m: Got expected 400 for missing 'url' field
+
+[1m[96m[TEST][0m Non-String Fields (expect 400 Bad Request)
+[92mΓ£ô PASS[0m: Got expected 400 for non-string email field
+
+[1m[96m[TEST][0m Demo Endpoint Test
+
+[1m[96m[TEST][0m Valid Payload (expect 200 OK)
+[92mΓ£ô PASS[0m: Got 200 OK with status='ok'
+[93mΓä╣ INFO[0m:   Steps: 1
+[93mΓä╣ INFO[0m:   Time: 1.6400000000139698s
+[93mΓä╣ INFO[0m:   Within limit: True
+
+[1m[93m============================================================[0m
+[1mTest Summary[0m
+[1m[93m============================================================[0m
+[92mΓ£ô PASS[0m: Valid Payload
+[92mΓ£ô PASS[0m: Invalid Secret
+[92mΓ£ô PASS[0m: Invalid JSON
+[92mΓ£ô PASS[0m: Missing Fields
+[92mΓ£ô PASS[0m: Non-String Fields
+[92mΓ£ô PASS[0m: Demo Endpoint
+
+[1m[96mTotal: 6/6 tests passed[0m
+[1m[93m============================================================[0m
+

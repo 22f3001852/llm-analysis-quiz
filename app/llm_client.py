@@ -40,6 +40,7 @@ CRITICAL RULES:
 - The answer can be a number, string, boolean, array, or object as needed
 - DO NOT explain your reasoning, just return the JSON with the answer
 - DO NOT say you cannot access content - everything is provided below
+- IMPORTANT: You MUST provide a non-empty answer. If you're uncertain, make your best educated guess based on the context provided.
 
 COMMON QUESTION PATTERNS TO LOOK FOR:
 - "What is the sum of..." → Add up the numbers
@@ -48,6 +49,7 @@ COMMON QUESTION PATTERNS TO LOOK FOR:
 - "What is the value of..." → Find specific value
 - "List all..." → Return an array
 - "Download file..." → The file content is already provided below
+- "POST this JSON to..." → This is an instruction, look for the actual question before this
 
 ====================
 QUIZ CONTENT:
@@ -64,12 +66,14 @@ Now analyze the content above carefully:
 2. Find the relevant data (tables, numbers, text patterns)
 3. Compute the answer precisely
 4. Return ONLY this JSON format: {{"answer": <computed_answer>}}
+5. IMPORTANT: The answer must be non-empty. Never return an empty string.
 
 Remember: 
 - If the question asks for a number, return a number (not a string)
 - If it asks for text, return a string
 - If it asks for multiple values, return an array or object
-- Be precise and accurate based on the data provided above"""
+- Be precise and accurate based on the data provided above
+- If you cannot find a specific answer, return your best interpretation of what should be answered"""
 
     payload = {
         "model": settings.llm_model,  # e.g. "gpt-4o-mini"
@@ -167,6 +171,13 @@ Remember:
     if "answer" not in answer_obj:
         raise ValueError(
             f"LLM JSON missing 'answer' key. Got: {json.dumps(answer_obj, indent=2)}"
+        )
+
+    # Validate that answer is not empty
+    ans = answer_obj.get("answer")
+    if ans == "" or ans is None:
+        raise ValueError(
+            f"LLM returned empty or null answer. Response was: {json.dumps(answer_obj, indent=2)}"
         )
 
     return answer_obj
