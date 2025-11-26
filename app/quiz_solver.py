@@ -172,7 +172,7 @@ def _heuristic_extract_answer(page_text: str) -> Optional[Any]:
     1. JSON-like `"answer": <value>` or 'answer' = <value> (handles quoted strings, numbers, true/false)
     2. Quoted string patterns: "the answer is '...'" or Answer: "..."
     3. Lines starting with 'Answer:' or 'The answer is' grabbing the rest of the line (words allowed)
-    4. Bare words enclosed in quotes (single or double)
+    4. Bare words enclosed in quotes (single or double) - but filter out short page titles
     5. First standalone number (float or int)
     6. First non-empty line (as last resort)
     Returns int/float where possible, otherwise returns a stripped string.
@@ -217,10 +217,14 @@ def _heuristic_extract_answer(page_text: str) -> Optional[Any]:
     if m_line2:
         return m_line2.group(1).strip().strip(' .;,"\'\n\r\t')
 
-    # 4) Any quoted token anywhere (first occurrence)
+    # 4) Any quoted token anywhere (first occurrence) - but skip very short page-title-like answers
     m_anyquote = re.search(r'["\']([^"\']{1,500})["\']', txt)
     if m_anyquote:
-        return m_anyquote.group(1).strip()
+        candidate = m_anyquote.group(1).strip()
+        # Filter: if it looks like a page title (short, all caps or title case, contains "demo" or "page")
+        # it's probably not the answer to a quiz question
+        if not (len(candidate) < 30 and ("demo" in candidate.lower() or "page" in candidate.lower())):
+            return candidate
 
     # 5) Any standalone number (float or int)
     m_num = re.search(r'([-+]?\d*\.\d+|\d+)', txt)
