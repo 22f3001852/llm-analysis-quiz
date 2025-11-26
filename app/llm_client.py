@@ -33,7 +33,7 @@ CRITICAL RULES:
 - ANALYZE the data provided thoroughly
 - PAY ATTENTION to what format is requested (number, string, sum, count, specific value, etc.)
 - If there are data files (CSV, JSON, etc.), analyze them to compute the answer
-- If the question mentions "secret", look for patterns or hidden values in the data
+- If the question mentions "secret" or "key", look for patterns, hidden values, or encoded data
 - If audio files are mentioned but can't be transcribed, state that clearly
 - COMPUTE the exact answer based on the data provided
 - Return ONLY a JSON object: {{"answer": <your_answer>}}
@@ -41,15 +41,18 @@ CRITICAL RULES:
 - DO NOT explain your reasoning, just return the JSON with the answer
 - DO NOT say you cannot access content - everything is provided below
 - IMPORTANT: You MUST provide a non-empty answer. If you're uncertain, make your best educated guess based on the context provided.
+- CRITICAL: DO NOT return page titles, headings, instructions, or menu items as answers. The answer is the COMPUTED/EXTRACTED result, not descriptive text.
+- If the page says "enable JavaScript to see the puzzle" - that's NOT the answer. The answer is what the puzzle asks you to find.
 
 COMMON QUESTION PATTERNS TO LOOK FOR:
 - "What is the sum of..." → Add up the numbers
-- "What is the secret..." → Look for hidden patterns, specific column values, or encoded data
+- "What is the secret/key..." → Look for hidden patterns, specific column values, or encoded data
 - "How many..." → Count items
 - "What is the value of..." → Find specific value
 - "List all..." → Return an array
 - "Download file..." → The file content is already provided below
 - "POST this JSON to..." → This is an instruction, look for the actual question before this
+- Alphametic puzzle (SEND MORE MONEY) → Solve it and return the numeric value or mapping
 
 ====================
 QUIZ CONTENT:
@@ -62,17 +65,18 @@ YOUR RESPONSE:
 ====================
 
 Now analyze the content above carefully:
-1. Identify the EXACT question being asked
-2. Find the relevant data (tables, numbers, text patterns)
-3. Compute the answer precisely
+1. Identify the EXACT question or puzzle being presented
+2. Find the relevant data (tables, numbers, text patterns, puzzles)
+3. Compute/solve the answer precisely
 4. Return ONLY this JSON format: {{"answer": <computed_answer>}}
-5. IMPORTANT: The answer must be non-empty. Never return an empty string.
+5. IMPORTANT: The answer must be non-empty and must be the RESULT of solving/computing, not the question text itself.
 
 Remember: 
 - If the question asks for a number, return a number (not a string)
 - If it asks for text, return a string
 - If it asks for multiple values, return an array or object
 - Be precise and accurate based on the data provided above
+- The answer should NEVER be instruction text or page titles
 - If you cannot find a specific answer, return your best interpretation of what should be answered"""
 
     payload = {
